@@ -16,9 +16,8 @@ def solve_p1(line):
 def solve_p2(lines):
     counter = Counter({i: 1 for i in range(len(lines))})
     for idx, line in enumerate(lines):
-        for i in range(idx + 1, idx + get_matches(line) + 1):
-            if i >= len(lines):
-                break
+        last_card = min(idx + get_matches(line) + 1, len(lines))
+        for i in range(idx + 1, last_card):
             counter[i] += counter[idx]
 
     return sum(counter.values())
