@@ -16,13 +16,12 @@ def solve_p1(line):
 def solve_p2(lines):
     counter = Counter({i: 1 for i in range(len(lines))})
     for idx, line in enumerate(lines):
-        for i in range(1, get_matches(line) + 1):
-            if (idx + i) >= len(lines):
+        for i in range(idx + 1, idx + get_matches(line) + 1):
+            if i >= len(lines):
                 break
-            counter[idx + i] += counter[idx]
+            counter[i] += counter[idx]
 
     return sum(counter.values())
 
 
-print("p1:", sum([solve_p1(i) for i in lines]))
-print("p2:", solve_p2(lines))
+print(f"p1: {sum([solve_p1(i) for i in lines])}\np2: {solve_p2(lines)}")
