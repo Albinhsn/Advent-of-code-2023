@@ -1,5 +1,3 @@
-from collections import Counter
-
 lines = open("input").read().split("\n")[:-1]
 
 
@@ -14,13 +12,13 @@ def solve_p1(line):
 
 
 def solve_p2(lines):
-    counter = Counter({i: 1 for i in range(len(lines))})
+    counter = [1 for _ in range(len(lines))]
     for idx, line in enumerate(lines):
         last_card = min(idx + get_matches(line) + 1, len(lines))
         for i in range(idx + 1, last_card):
             counter[i] += counter[idx]
 
-    return sum(counter.values())
+    return sum(counter)
 
 
 print(f"p1: {sum([solve_p1(i) for i in lines])}\np2: {solve_p2(lines)}")
