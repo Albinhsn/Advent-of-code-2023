@@ -6,9 +6,18 @@
 #include <stdlib.h>
 #include <string.h>
 
-char *read_file(char *file_path);
+struct IntArray {
+  int length;
+  int *array;
+  int capacity;
+};
 
-int parse_digit(char *line, int *i);
+struct IntArray * initArray();
+struct IntArray *copyArray(struct IntArray *array);
+void resizeArray(struct IntArray *array);
+void appendArray(struct IntArray *array, int nmbr);
+void freeArray(struct IntArray *array);
+struct IntArray *parseIntsFromString(char *content);
 
 struct Lines {
   int length;
@@ -16,14 +25,11 @@ struct Lines {
   int capacity;
 };
 
-struct Map {
-  char *keys;
-  int *values;
-  int length;
-  int capacity;
-};
+char *read_file(char *file_path);
 
-void initLines(struct Lines *lines);
+int parse_digit(char *line, int *i);
+
+struct Lines * initLines();
 void resizeLines(struct Lines *lines);
 void appendLine(struct Lines *lines, char *line);
 void freeLines(struct Lines *lines);
