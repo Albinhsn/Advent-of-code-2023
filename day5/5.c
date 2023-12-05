@@ -42,18 +42,86 @@ int solve_p1(char *content) {
     return answer;
 }
 
+struct Range *getOverlap(struct Range *range, long s_start, long s_end,
+                         long d_start) {
+    struct Range *newRange = (struct Range *)malloc(sizeof(struct Range));
+    newRange->start =
+        d_start + (range->start > s_start ? range->start : s_start) - s_start;
+
+    newRange->end =
+        d_start + (range->end < s_end ? range->end : s_end) - s_start;
+
+    return newRange;
+}
+
 long parse_p2(char *content) {
     struct Lines *lines = initLines();
     parseLines(lines, "\n", content);
 
     struct LongArray *seeds = parseIntsFromString(lines->lines[0]);
-
-    // Create LongArray ** with ranges
-    // Create stack from LongArray** and iterate until empty
-    // repeat
-
-    freeLines(lines);
+    struct Stack *stack = initStack();
+    // for (int i = 0; i < seeds->length; i += 2) {
+    //     struct Range *range = (struct Range *)malloc(sizeof(struct Range));
+    //     range->start = seeds->array[i];
+    //     range->end = seeds->array[i] + seeds->array[i + 1];
+    //     push(stack, range);
+    // }
+    struct Range *range = (struct Range *)malloc(sizeof(struct Range));
+    range->start = 82;
+    range->end = 87;
+    push(stack, range);
     freeArray(seeds);
+    int i = 0;
+    while (i < lines->length) {
+        struct Stack *newStack = copyStack(stack);
+        while (i < lines->length && isdigit(lines->lines[i][0])) {
+            struct LongArray *ranges = parseIntsFromString(lines->lines[i]);
+            long s_start = ranges->array[1], s_dist = ranges->array[2],
+                 s_end = ranges->array[1] + ranges->array[2];
+            long d_start = ranges->array[0];
+
+            while (true) {
+                if (stack->length == 0) {
+                    break;
+                }
+                struct Range *range = pop(stack);
+                // Outside the range
+                if (range->start > s_end || range->end < s_start) {
+                    continue;
+                }
+                struct Range *newRange =
+                    getOverlap(range, s_start, s_end, d_start);
+                push(newStack, newRange);
+
+                // Fully within the s_range
+                if (range->start >= s_start && range->end <= s_end) {
+                    continue;
+                }
+                // Was above
+                struct Range *newRange2 =
+                    (struct Range *)malloc(sizeof(struct Range));
+                if (range->end > s_end) {
+                    newRange2->start = s_end + 1;
+                    newRange2->end = range->end;
+                    push(newStack, newRange2);
+                } else {
+                    newRange2->start = range->start;
+                    newRange2->end = s_start - 1;
+                    push(newStack, newRange2);
+                }
+            }
+            freeArray(ranges);
+            i++;
+        }
+        freeStack(stack);
+        stack = newStack;
+        i++;
+    }
+    for (int i = 0; i < stack->length; ++i) {
+        printf("%lu -", stack->stack[i].start);
+    }
+    printf("\n");
+    freeLines(lines);
     return 0;
 }
 
