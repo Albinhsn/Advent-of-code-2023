@@ -15,7 +15,7 @@ char *read_file(char *file_path) {
   return buffer;
 }
 
-int parse_digit(char *line, int *i) {
+long parse_digit(char *line, int *i) {
   int prev = *i;
   while (isdigit(line[*i])) {
     (*i)++;
@@ -26,7 +26,7 @@ int parse_digit(char *line, int *i) {
   memcpy(id_str, &line[prev], diff);
   id_str[diff] = '\0';
 
-  int id = atoi(id_str);
+  long id = atol(id_str);
 
   free(id_str);
   return id;
@@ -74,8 +74,8 @@ void parseLines(struct Lines *lines, char *delim, char *content) {
   }
 }
 
-struct IntArray *copyArray(struct IntArray *array) {
-  struct IntArray *newArray = initArray();
+struct LongArray *copyArray(struct LongArray *array) {
+  struct LongArray *newArray = initArray();
   for (int i = 0; i < array->length; ++i) {
     appendArray(newArray, array->array[i]);
   }
@@ -83,32 +83,35 @@ struct IntArray *copyArray(struct IntArray *array) {
   return newArray;
 }
 
-struct IntArray *initArray() {
-  struct IntArray *array = (struct IntArray *)malloc(sizeof(struct IntArray));
+struct LongArray *initArray() {
+  struct LongArray *array =
+      (struct LongArray *)malloc(sizeof(struct LongArray));
   array->length = 0;
   array->capacity = 16;
-  array->array = (int *)malloc(sizeof(int) * array->capacity);
+  array->array = (long *)malloc(sizeof(long) * array->capacity);
 
   return array;
 }
 
-void resizeArray(struct IntArray *array) {
+void resizeArray(struct LongArray *array) {
   if (array->length >= array->capacity) {
     array->capacity = 2 * array->capacity;
-    array->array = (int *)realloc(array->array, sizeof(int) * array->capacity);
+    array->array =
+        (long *)realloc(array->array, sizeof(long) * array->capacity);
   }
 }
 
-void appendArray(struct IntArray *array, int nmbr) {
+void appendArray(struct LongArray *array, long nmbr) {
   resizeArray(array);
   array->array[array->length++] = nmbr;
 }
-inline void freeArray(struct IntArray *array) {
+
+inline void freeArray(struct LongArray *array) {
   free(array->array);
   free(array);
 }
-struct IntArray *parseIntsFromString(char *content) {
-  struct IntArray *array = initArray();
+struct LongArray *parseIntsFromString(char *content) {
+  struct LongArray *array = initArray();
   int i = 0;
   while (i < strlen(content)) {
     if (isdigit(content[i])) {
@@ -118,4 +121,33 @@ struct IntArray *parseIntsFromString(char *content) {
     }
   }
   return array;
+}
+
+long *pop(struct Stack *stack) {
+  long *out = stack->stack[stack->length - 1];
+  stack->length--;
+  return out;
+}
+void resizeStack(struct Stack *stack) {
+  if (stack->length >= stack->capacity) {
+    stack->capacity = 2 * stack->capacity;
+    stack->stack =
+        (long **)realloc(stack->stack, sizeof(long *) * stack->capacity);
+  }
+}
+void push(struct Stack *stack, long *node) {
+  resizeStack(stack);
+  stack->stack[stack->length] = node;
+}
+void freeStack(struct Stack *stack) {
+  free(stack->stack);
+  free(stack);
+}
+struct Stack *initStack() {
+  struct Stack *stack = (struct Stack *)malloc(sizeof(struct Stack));
+  stack->length = 0;
+  stack->capacity = 16;
+  stack->stack = (long **)malloc(sizeof(long *) * stack->capacity);
+
+  return stack;
 }

@@ -6,18 +6,29 @@
 #include <stdlib.h>
 #include <string.h>
 
-struct IntArray {
+struct LongArray {
   int length;
-  int *array;
+  long *array;
   int capacity;
 };
 
-struct IntArray * initArray();
-struct IntArray *copyArray(struct IntArray *array);
-void resizeArray(struct IntArray *array);
-void appendArray(struct IntArray *array, int nmbr);
-void freeArray(struct IntArray *array);
-struct IntArray *parseIntsFromString(char *content);
+struct Stack {
+  int length;
+  long **stack;
+  int capacity;
+};
+
+long *pop(struct Stack *stack);
+void push(struct Stack *stack, long *node);
+void freeStack(struct Stack *stack);
+struct Stack *initStack();
+
+struct LongArray *initArray();
+struct LongArray *copyArray(struct LongArray *array);
+void resizeArray(struct LongArray *array);
+void appendArray(struct LongArray *array, long nmbr);
+void freeArray(struct LongArray *array);
+struct LongArray *parseIntsFromString(char *content);
 
 struct Lines {
   int length;
@@ -27,9 +38,9 @@ struct Lines {
 
 char *read_file(char *file_path);
 
-int parse_digit(char *line, int *i);
+long parse_digit(char *line, int *i);
 
-struct Lines * initLines();
+struct Lines *initLines();
 void resizeLines(struct Lines *lines);
 void appendLine(struct Lines *lines, char *line);
 void freeLines(struct Lines *lines);
