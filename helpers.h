@@ -16,6 +16,15 @@ struct Lines {
   int capacity;
 };
 
+struct Map {
+  char *keys;
+  int *values;
+  int length;
+  int capacity;
+};
+
 void initLines(struct Lines *lines);
 void resizeLines(struct Lines *lines);
-void appendLine(struct Lines* lines, char * line);
+void appendLine(struct Lines *lines, char *line);
+void freeLines(struct Lines *lines);
+void parseLines(struct Lines *lines, char *delim, char *content);

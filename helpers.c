@@ -52,3 +52,30 @@ void appendLine(struct Lines *lines, char *line) {
   lines->lines[lines->length][strlen(line)] = '\0';
   lines->length++;
 }
+
+void freeLines(struct Lines *lines) {
+  for (int i = 0; i < lines->length; ++i) {
+    free(lines->lines[i]);
+  }
+  free(lines->lines);
+}
+
+void parseLines(struct Lines *lines, char *delim, char *content) {
+  char *line = strtok(content, "\n");
+  initLines(lines);
+  while (line != NULL) {
+    resizeLines(lines);
+    appendLine(lines, line);
+    line = strtok(0, "\n");
+  }
+}
+
+
+
+void resizeMap(struct Map *map) {
+  if (map->length >= map->capacity) {
+    map->capacity = 2 * map->capacity;
+    map->keys = (char *)realloc(map->keys, sizeof(char) * map->capacity);
+    map->values = (int *)realloc(map->keys, sizeof(int) * map->capacity);
+  }
+}

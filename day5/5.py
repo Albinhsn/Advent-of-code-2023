@@ -51,31 +51,35 @@ def calc_new_ranges(values, p2_seeds):
     seed_range = Q.popleft()
     while True:
         flag = False
+        seed_lower, seed_upper = seed_range[0], seed_range[1]
         for val in values:
-            if seed_range[0] > val[1] + val[2] or seed_range[1] < val[1]:
+            source_lower, source_higher = val[1], val[1] + val[2]
+
+            if seed_lower > source_higher or seed_upper < source_lower:
                 continue
             # Our overlapping range
-            start = val[0] + max(seed_range[0], val[1]) - val[1]
-            end = val[0] + min(seed_range[1], val[1] + val[2]) - val[1]
+            start = val[0] + max(seed_lower, source_lower) - source_lower
+            end = val[0] + min(seed_upper, source_higher) - source_lower
             new_seeds.append((start, end))
 
             # seed range was within the source range
-            if seed_range[0] >= val[1] and seed_range[1] <= val[1] + val[2]:
+            if seed_lower >= source_lower and seed_upper <= source_higher:
                 flag = True
                 break
+
             # source range was within the seed range
-            if seed_range[0] < val[1] and seed_range[1] < val[1] + val[2]:
-                Q.append((seed_range[0], val[1] - 1))
-                seed_range = (val[1] + val[2] + 1, seed_range[0] + seed_range[1])
-                flag = True
-                break
+            if seed_lower < source_lower and seed_upper < source_higher:
+                Q.append((seed_lower, source_lower - 1))
+                seed_range = (source_higher + 1, seed_upper)
+                continue
+
             # we are below with the overlap
-            elif seed_range[0] < val[1]:
-                seed_range = (seed_range[0], val[1] - 1)
+            elif seed_lower < source_lower:
+                seed_range = (seed_lower, source_lower - 1)
 
             # we are above with the overlap
             else:
-                seed_range = (val[1] + val[2] + 1, seed_range[0])
+                seed_range = (source_higher + 1, seed_lower)
         if not flag:
             new_seeds.append(seed_range)
         if not Q:
