@@ -4,25 +4,19 @@ int solve_p1(char *content) {
     struct Lines *lines = initLines();
     parseLines(lines, "\n", content);
 
-    struct IntArray *seeds = parseIntsFromString(lines->lines[0]);
+    struct LongArray *seeds = parseIntsFromString(lines->lines[0]);
     int i = 0;
 
     while (i < lines->length) {
-        struct IntArray *newArray = copyArray(seeds);
-
-        if (i < lines->length && isdigit(lines->lines[i][0])) {
-            for (int j = 0; j < seeds->length; ++j) {
-                printf("%d - ", seeds->array[j]);
-            }
-            printf("\n");
-        }
+        struct LongArray *newArray = copyArray(seeds);
 
         while (i < lines->length && isdigit(lines->lines[i][0])) {
-            struct IntArray *ranges = parseIntsFromString(lines->lines[i]);
+            struct LongArray *ranges = parseIntsFromString(lines->lines[i]);
 
             for (int j = 0; j < seeds->length; ++j) {
                 if (ranges->array[1] > seeds->array[j] ||
-                    seeds->array[j] > ranges->array[1] + ranges->array[2]) {
+                    seeds->array[j] > ranges->array[1] + ranges->array[2] ||
+                    newArray->array[j] != seeds->array[j]) {
                     continue;
                 }
 
@@ -39,10 +33,8 @@ int solve_p1(char *content) {
     }
     int answer = INT_MAX;
     for (int i = 0; i < seeds->length; ++i) {
-        printf("%d - ", seeds->array[i]);
         answer = answer > seeds->array[i] ? seeds->array[i] : answer;
     }
-    printf("\n");
 
     freeArray(seeds);
     freeLines(lines);
@@ -50,14 +42,19 @@ int solve_p1(char *content) {
     return answer;
 }
 
-int parse_p2(char *content) {
-    char *line = strtok(content, "\n\n");
-    int answer = 0;
+long parse_p2(char *content) {
+    struct Lines *lines = initLines();
+    parseLines(lines, "\n", content);
 
-    while (line != NULL) {
-        line = strtok(0, "\n");
-    }
-    return answer;
+    struct LongArray *seeds = parseIntsFromString(lines->lines[0]);
+
+    // Create LongArray ** with ranges
+    // Create stack from LongArray** and iterate until empty
+    // repeat
+
+    freeLines(lines);
+    freeArray(seeds);
+    return 0;
 }
 
 int main(int argc, char *argv[]) {
