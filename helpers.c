@@ -14,6 +14,19 @@ char *read_file(char *file_path) {
 
   return buffer;
 }
+struct LongArray *parseLongsFromLine(struct String *line) {
+  struct LongArray *array = initArray();
+  int i = 0;
+  while (i < line->length) {
+    if (isdigit(line->string[i])) {
+      appendArray(array, parse_digit(line->string, &i));
+    } else {
+      i++;
+    }
+  }
+
+  return array;
+}
 
 long parse_digit(char *line, int *i) {
   int prev = *i;
@@ -32,46 +45,47 @@ long parse_digit(char *line, int *i) {
   return id;
 }
 
-struct Lines *initLines() {
-  struct Lines *lines = (struct Lines *)malloc(sizeof(struct Lines));
-  lines->length = 0;
-  lines->capacity = 16;
-  lines->lines = (char **)malloc(sizeof(char *) * lines->capacity);
-
-  return lines;
-}
-
-inline void resizeLines(struct Lines *lines) {
-  if (lines->length >= lines->capacity) {
-    lines->capacity = 2 * lines->capacity;
-    lines->lines =
-        (char **)realloc(lines->lines, sizeof(char *) * lines->capacity);
+static inline void resizeStringArray(struct StrArray *array) {
+  if (array->length >= array->capacity) {
+    array->capacity *= 2;
+    array->array = (struct String *)realloc(
+        array->array, sizeof(struct String) * array->capacity);
   }
 }
 
-void appendLine(struct Lines *lines, char *line) {
-  resizeLines(lines);
-
-  lines->lines[lines->length] = (char *)malloc((strlen(line) + 1));
-  memcpy(lines->lines[lines->length], line, strlen(line));
-  lines->lines[lines->length][strlen(line)] = '\0';
-  lines->length++;
+void appendString(struct StrArray *array, char *string) {
+  struct String str;
+  str.string = string;
+  str.length = strlen(string);
+  resizeStringArray(array);
+  array->array[array->length++] = str;
 }
 
-void freeLines(struct Lines *lines) {
-  for (int i = 0; i < lines->length; ++i) {
-    free(lines->lines[i]);
-  }
-  free(lines->lines);
+void freeStringArray(struct StrArray *array) {
+  free(array->array);
+  free(array);
 }
 
-void parseLines(struct Lines *lines, char *delim, char *content) {
+struct StrArray *initStringArray() {
+  struct StrArray *array = (struct StrArray *)malloc(sizeof(struct StrArray));
+  array->length = 0;
+  array->capacity = 8;
+  array->array =
+      (struct String *)malloc(sizeof(struct String) * array->capacity);
+
+  return array;
+}
+
+struct StrArray *parseLines(char *delim, char *content) {
+  struct StrArray *array = initStringArray();
   char *line = strtok(content, delim);
   while (line != NULL) {
-    resizeLines(lines);
-    appendLine(lines, line);
+    resizeStringArray(array);
+    appendString(array, line);
     line = strtok(0, delim);
   }
+
+  return array;
 }
 
 struct LongArray *copyArray(struct LongArray *array) {
@@ -110,6 +124,7 @@ inline void freeArray(struct LongArray *array) {
   free(array->array);
   free(array);
 }
+
 struct LongArray *parseIntsFromString(char *content) {
   struct LongArray *array = initArray();
   int i = 0;
@@ -123,31 +138,16 @@ struct LongArray *parseIntsFromString(char *content) {
   return array;
 }
 
-long *pop(struct Stack *stack) {
-  long *out = stack->stack[stack->length - 1];
-  stack->length--;
-  return out;
-}
-void resizeStack(struct Stack *stack) {
-  if (stack->length >= stack->capacity) {
-    stack->capacity = 2 * stack->capacity;
-    stack->stack =
-        (long **)realloc(stack->stack, sizeof(long *) * stack->capacity);
+long concatDigitsFromLine(struct String string) {
+  int count = 0;
+  long nmbr = 0;
+  int i = (int)string.length - 1;
+  while (i >= 0) {
+    if (isdigit(string.string[i])) {
+      nmbr += (string.string[i] - '0') * pow(10, count);
+      count++;
+    }
+    i--;
   }
-}
-void push(struct Stack *stack, long *node) {
-  resizeStack(stack);
-  stack->stack[stack->length] = node;
-}
-void freeStack(struct Stack *stack) {
-  free(stack->stack);
-  free(stack);
-}
-struct Stack *initStack() {
-  struct Stack *stack = (struct Stack *)malloc(sizeof(struct Stack));
-  stack->length = 0;
-  stack->capacity = 16;
-  stack->stack = (long **)malloc(sizeof(long *) * stack->capacity);
-
-  return stack;
+  return nmbr;
 }
