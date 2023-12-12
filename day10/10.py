@@ -1,6 +1,6 @@
 from collections import deque
 
-lines = open("ex").read().split("\n")[:-1]
+lines = open("input").read().split("\n")[:-1]
 
 
 def get_neighbours(pos):
@@ -166,42 +166,50 @@ def get_escape_path(curr):
 
         xlyr = get_c(xl, yr)
         xryr = get_c(xr, yr)
-        print("-" * 15)
-        print(curr)
-        print(xlyr, xryr)
-        print(get_c(xl, curr[1]), get_c(xr, curr[1]))
-        print(xlyl, xryl)
+        xl1 = get_c(xl, curr[1])
+        xr1 = get_c(xr, curr[1])
+        # print("-" * 15)
+        # print(curr)
+        # print(xlyr, " ", xryr)
+        # print(get_c(xl, curr[1]), ".", get_c(xr, curr[1]))
+        # print(xlyl, " ", xryl)
 
         # Check if we can move down
         if (xlyl, xryl) in [
             ("|", "|"),
-            ("J", "|"),
-            ("7", "|"),
             ("|", "F"),
             ("|", "L"),
+            ("|", "S"),
             ("S", "|"),
             ("S", "F"),
             ("S", "L"),
-            ("|", "S"),
-            ("J", "S"),
+            ("7", "|"),
             ("7", "S"),
-            ("J", "L"),
             ("7", "L"),
+            ("7", "F"),
+            ("J", "|"),
+            ("J", "S"),
+            ("J", "L"),
+            ("J", "F"),
         ]:
             # X, y -1
-            print("Down", xlyl, xryl)
+            # print("Down", xlyl, xryl)
             Q.append((curr[0], yl))
         # check if we can move down and left
-        if (xlyr, xlyl) in [
-            ("J", "7"),
+        if (xl1, xlyl) in [
             ("J", "-"),
             ("J", "S"),
+            ("J", "F"),
+            ("J", "7"),
+            ("S", "F"),
+            ("S", "-"),
+            ("S", "7"),
         ]:
-            print("Down left", xlyl, xryl)
+            # print("Down left", xl1, xlyl)
             Q.append((xl, curr[1] + 0.5))
         # check if we can move down and right
-        if (xryr, xryl) in [("S", "-"), ("L", "-"), ]:
-            print("Down right", xlyl, xryl)
+        if (xr1, xryl) in [("S", "-"), ("L", "-"), ("L", "7"), ("S", "7"), ("L", "F")]:
+            # print("Down right", xr1, xryl)
             # x - 0.5 , y + 0.5
             Q.append((xr, curr[1] + 0.5))
 
@@ -223,25 +231,27 @@ def get_escape_path(curr):
             ("S", "F"),
             ("S", "L"),
         ]:
-            print("Up", xlyr, xryr)
+            # print("Up", xlyr, xryr)
             Q.append((curr[0], yr))
         # check if we can move up and left
-        elif (xlyr, xryr) in [("-", "S"), ("L", "S"), ("L", "7")]:
-            print("Up left", xlyr, xryr)
+        if (xlyr, xl1) in [("-", "S"), ("L", "S"), ("L", "7"), ("-", "7"), ("J", "7")]:
+            # print("Up left", xlyr, xryr)
             Q.append((xl, curr[1] - 0.5))
         elif (xlyr, xryr) == ("S", "7") and get_c(xl, yr + 1) not in ["|", "J", "L"]:
-            print("Up left", xlyr, xryr)
+            # print("Up left", xlyr, xryr)
             Q.append((xl, curr[1] - 0.5))
 
         # check if we can move up and right
-        elif (xlyr, xryr) in [
+        # SWAPPED VARS
+        if (xr1, xryr) in [
             ("S", "-"),
             ("S", "J"),
             ("F", "-"),
             ("F", "J"),
             ("F", "S"),
+            ("F", "L"),
         ]:
-            print("Up right", xlyr, xryr)
+            # print("Up right", xr1, xryr)
             Q.append((xr, curr[1] - 0.5))
 
     else:
@@ -261,49 +271,70 @@ def get_escape_path(curr):
 
         xlyr = get_c(xl, yr)
         xryr = get_c(xr, yr)
-
-        print("-" * 15)
-        print(curr)
-        print(xlyr, get_c(curr[0], yr), xryr)
-        print(xlyl, get_c(curr[0], yl), xryl)
+        yr0 = get_c(curr[0], yr)
+        yl0 = get_c(curr[0], yl)
+        # print("-" * 15)
+        # print(curr)
+        # print(xlyr, "", get_c(curr[0], yr), "", xryr)
+        # print("   .")
+        # print(xlyl, "", get_c(curr[0], yl), "", xryl)
 
         # Check if we can move left
         if xlyl not in [".", "L", "J", "S", "|"] and xlyr != ".":
-            print("Left", xlyl, xlyr)
+            # print("Left", xlyl, xlyr)
             Q.append((xl, curr[1]))
         # Check if we can move left and up
-        elif (xlyl, xlyr) in [("S", "7"), ("L", "7"), ("L", "S")]:
-            print("Left up", xlyl, xlyr)
+        if (xlyr, yr0) in [
+            ("7", "S"),
+            ("7", "L"),
+            ("S", "L"),
+            ("J", "L"),
+            ("|", "L"),
+            ("|", "S"),
+        ]:
+            # print("Left up", xlyr, yr0)
             Q.append((curr[0] - 0.5, yr))
         # Check if we can move left and down
-        elif (xlyr, xlyl) in [("S", "J"), ("F", "J"), ("F", "|"), ("J", "F")]:
-            print("Left down", xlyl, xlyr)
+        if (xlyl, yl0) in [
+            ("S", "J"),
+            ("F", "J"),
+            ("F", "|"),
+            ("J", "F"),
+            ("|", "F"),
+            ("7", "F"),
+            ("7", "S"),
+        ]:
+            # print("Left down", xlyl, yl0)
             Q.append((curr[0] - 0.5, yl))
 
         # Check if we can move right
         if xryl not in ["L", ".", "J", "S", "|"] and xryr != ".":
-            print("Right", xryl, xryr)
+            # print("Right", xryl, xryr)
             Q.append((xr, curr[1]))
         # Check if we can move right and up
-
-        elif (xryl, xryr) in [
+        if (yr0, xryr) in [
             ("S", "F"),
-            ("S", "J"),
             ("J", "|"),
             ("J", "S"),
             ("J", "F"),
+            ("S", "|"),
+            ("S", "L"),
+            ("J", "L"),
         ]:
-            print("Right up", xryl, xryr)
+            # print("Right up", yr0, xryr)
             # elif xryl in ["S", "J"] and xryr in ["|", "S", "F", "J"]:
             Q.append((curr[0] + 0.5, yr))
         # Check if we can move right and down
-        elif (xryl, xryr) in [
+        if (yl0, xryl) in [
             ("S", "L"),
+            ("S", "F"),
+            ("S", "|"),
             ("7", "|"),
             ("7", "S"),
             ("7", "L"),
+            ("7", "F"),
         ]:
-            print("Right down", xryl, xryr)
+            # print("Right down", yl0, xryl)
             # elif xryr in ["S", "7"] and xryl in ["|", "S", "L"]:
             Q.append((curr[0] + 0.5, yl))
 
@@ -332,7 +363,12 @@ def escape(min_x, max_x, min_y, max_y, pos):
             if not not_within_range(i, min_x, max_x, min_y, max_y)
             and curr not in get_escape_path(i)
         ]:
-            missing = [i for i in q if curr not in get_escape_path(i)]
+            missing = [
+                i
+                for i in q
+                if not not_within_range(i, min_x, max_x, min_y, max_y)
+                and curr not in get_escape_path(i)
+            ]
             raise Exception(f"{curr} -> {missing[0]}")
 
         Q.extendleft(q)
@@ -369,10 +405,10 @@ path = traverse(start_pos)
 print("p1", len(path) // 2)
 
 change_lines(path)
-print_map()
+# print_map()
 
 p2 = solve_p2(path)
-# print(len(p2))
+print(len(p2))
 # print(get_escape_path((2, 1.5)))
 # print_map_p2(path, p2)
 # print("p2", len(p2))
