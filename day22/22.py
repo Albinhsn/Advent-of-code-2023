@@ -161,41 +161,7 @@ def calc_heights_iter(lines, M, heights):
 
 
 def solve_p2(lines):
-    M = {}
-    heights = {}
-    for idx, line in enumerate(lines):
-        above = set()
-        below = set()
-        for i, l in enumerate(lines):
-            if i == idx:
-                continue
-            if l[0][0] > line[1][0] or line[0][0] > l[1][0]:
-                continue
-            if l[0][1] > line[1][1] or line[0][1] > l[1][1]:
-                continue
-            if l[0][2] > line[1][2]:
-                above.add(l)
-            elif l[1][2] < line[0][2]:
-                below.add(l)
-
-        if DEBUG:
-            heights[get_char(idx)] = line[1][2] - line[0][2] + 1
-            M[get_char(idx)] = (above, below)
-        else:
-            heights[idx] = line[1][2] - line[0][2] + 1
-            M[idx] = (above, below)
-    M = {k: change_val(v, lines) for k, v in M.items()}
-    H = {}
-    calc_heights_iter(lines, M, H)
-    above = {
-        key: [i for i in above if H[i] == H[key] + heights[i]]
-        for (key, (above, _)) in M.items()
-    }
-    below = {
-        key: [i for i in below if H[i] + heights[key] == H[key]]
-        for (key, (_, below)) in M.items()
-    }
-
+    M, _, above, below = get_transforms(lines)
     p2 = 0
     for key in M:
         fallen = set()
@@ -219,8 +185,7 @@ def solve_p2(lines):
     print("p2", p2)
 
 
-def solve_p1(lines):
-    answer = 0
+def get_transforms(lines):
     M = {}
     heights = {}
     for idx, line in enumerate(lines):
@@ -255,6 +220,12 @@ def solve_p1(lines):
         key: [i for i in below if H[i] + heights[key] == H[key]]
         for (key, (_, below)) in M.items()
     }
+    return M, H, supported_by, supports
+
+
+def solve_p1(lines):
+    _, _, supported_by, supports = get_transforms(lines)
+    answer = 0
     for val in supported_by.values():
         if not val:
             answer += 1
