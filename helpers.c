@@ -97,6 +97,18 @@ struct LongArray *copyArray(struct LongArray *array) {
   return newArray;
 }
 
+void sortLongArray(struct LongArray *array) {
+  for (int i = 0; i < array->length - 1; ++i) {
+    for (int j = i + 1; j < array->length; j++) {
+      if (array->array[i] < array->array[j]) {
+        long tmp = array->array[i];
+        array->array[i] = array->array[j];
+        array->array[j] = tmp;
+      }
+    }
+  }
+}
+
 struct LongArray *initArray() {
   struct LongArray *array =
       (struct LongArray *)malloc(sizeof(struct LongArray));

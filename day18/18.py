@@ -70,6 +70,23 @@ def solve_p2():
     def check_me(value, lines):
         return len([i for i in lines if i[0] <= value <= i[1]]) > 0
 
+    def is_within(y, x, ylines, xlines):
+        above = [i[1] for i in ylines.items() if i[0] < y]
+        below = [i[1] for i in ylines.items() if i[0] > y]
+        la, lb = 0, 0
+        # Need to correct for there is a xline above/below make that line count as 1
+        for line in below:
+            for b in line:
+                if b[0] <= x <= b[1]:
+                    lb += 1
+        for line in above:
+            for b in line:
+                if b[0] <= x <= b[1]:
+                    la += 1
+        if not la or not lb:
+            return False
+        return la % 2 == 1 or lb % 2 == 1
+
     lines = open(sys.argv[1]).read().strip().split("\n")
     pos = (0, 0)
     visitedX, visitedY = {}, {}
@@ -81,15 +98,12 @@ def solve_p2():
         # steps = int(hexa[2:-2], 16)
 
         pos = walk(pos, int(steps), dir, visitedX, visitedY)
-
+    previous =deepcopy(visitedY)
     for xkey, xline in sorted(visitedX.items()):
         for start, stop in xline:
             for i in range(start, stop + 1):
-                # Have we written to the left off this wall?
-                if i in visitedY and [
-                    j for j in visitedY[i] if j[0] <= (xkey - 1) <= j[1]
-                ]:
-                    # Was this written by a line across the x axis previously?
+                # Are we within the walls?
+                if not is_within(i, xkey + 1, previous, visitedX):
                     continue
 
                 next_wall = [

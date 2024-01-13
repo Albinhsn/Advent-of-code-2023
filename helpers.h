@@ -53,6 +53,7 @@ struct Queue {
 };
 
 struct LongArray *initArray();
+void sortLongArray(struct LongArray * array);
 struct LongArray *copyArray(struct LongArray *array);
 void appendArray(struct LongArray *array, long nmbr);
 void freeArray(struct LongArray *array);
